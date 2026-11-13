@@ -9,6 +9,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Locate project files
+        run: |
+          ls -la
+          P=$(find . -name package_onion.sh -not -path './.git/*' | head -1)
+          echo "found: $P"
+          if [ -z "$P" ]; then echo "package_onion.sh not found - upload is incomplete"; exit 1; fi
+          D=$(dirname "$P")
+          if [ "$D" != "." ]; then cp -r "$D"/. . ; fi
+          ls -la
+          ls src
+
       - name: Get Miyoo Mini toolchain
         run: git clone --depth 1 https://github.com/shauninman/union-miyoomini-toolchain /tmp/tc
 
