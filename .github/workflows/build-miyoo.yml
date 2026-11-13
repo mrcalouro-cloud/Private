@@ -1,1 +1,24 @@
+name: Build Miyoo package
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get Miyoo Mini toolchain
+        run: git clone --depth 1 https://github.com/shauninman/union-miyoomini-toolchain /tmp/tc
+      - name: Build toolchain image
+        run: cd /tmp/tc && docker build -t miyoo-tc .
+      - name: Compile game (SDL 1.2 first, SDL2 as fallback)
+        run: |
+          docker run --rm -v "$PWD":/root/workspace/abobo miyoo-tc /bin/bash -c "cd /root/workspace/abobo && (make miyoo1 || make miyoo)"
+          ls -l abobo
+      - name: Package for Onion
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          chmod +x package_onion.sh && ./package_onion.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AbobosBigAdventurea
+          path: AbobosBigAdventure
 
