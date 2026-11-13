@@ -19,6 +19,5 @@ jobs:
           chmod +x package_onion.sh && ./package_onion.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: AbobosBigAdventurea
+          name: AbobosBigAdventure
           path: AbobosBigAdventure
-
