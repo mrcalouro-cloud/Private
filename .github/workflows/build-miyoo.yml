@@ -28,8 +28,18 @@ jobs:
 
       - name: Compile game
         run: |
-          docker run --rm -v "$PWD":/root/workspace/abobo miyoo-tc /bin/bash -c "cd /root/workspace/abobo && (make miyoo1 || make miyoo)"
-          ls -l abobo
+          docker run --rm -v "$PWD":/root/workspace/abobo miyoo-tc /bin/bash -c '
+            cd /root/workspace/abobo || exit 1
+            pwd
+            ls -la
+            ls src
+            echo "CROSS_COMPILE=$CROSS_COMPILE"
+            CC="${CROSS_COMPILE}gcc"
+            $CC --version | head -1
+            SRC="src/rt_core.c src/rt_interp.c src/rt_mc.c src/rt_render.c src/rt_builtins.c"
+            $CC -O2 -w -DUSE_SDL1 -o abobo src/platform_sdl.c $SRC -lSDL -lSDL_mixer -lz -lm || $CC -O2 -w -o abobo src/platform_sdl.c $SRC $(sdl2-config --cflags --libs) -lSDL2_mixer -lz -lm
+            ls -l abobo
+          '
 
       - name: Package for Onion
         run: |
